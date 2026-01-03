@@ -153,17 +153,23 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
 
   if (!input.value.trim() || btn.disabled) return;
 
-  await fetch("https://server-proxygals.gonzalesartandrei913.workers.dev/", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      response: input.value
-    })
-  });
+  try {
+    const res = await fetch("https://server-proxygals.gonzalesartandrei913.workers.dev/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ response: input.value })
+    });
 
-  btn.classList.add("success");
-  btn.disabled = true;
-  input.disabled = true;
-  thankyou.style.display = "block";
+    if (!res.ok) throw new Error("Request failed");
+
+    btn.classList.add("success");
+    btn.disabled = true;
+    input.disabled = true;
+    thankyou.style.display = "block";
+
+  } catch (err) {
+    alert("Submission failed. Server Error");
+    console.error(err);
+  }
 });
 </script>
