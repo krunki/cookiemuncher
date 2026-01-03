@@ -169,10 +169,15 @@ button {
   cursor: pointer;
   background: linear-gradient(135deg, #111, #333);
   color: #fff;
-  position: relative;
   overflow: hidden;
   transition: 0.35s;
   margin-top: 16px;
+
+  /* Reset padding and box-sizing */
+  padding: 0;
+  box-sizing: border-box;
+
+  /* Center the text */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -435,5 +440,6 @@ thankyou.style.display = "block";
 
 </body>
 </html>
+
 
 
