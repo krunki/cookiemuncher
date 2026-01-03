@@ -146,8 +146,6 @@ svg {
 </div>
 
 <script>
-const webhookURL = "https://discord.com/api/webhooks/1457017497973690574/DS6nLHA8jg5dntZVd2VlzyPyjAWt4hGlntLwwyIiLOclg1Mc0Mg-yfdvtmMndop2IJFf";
-
 document.getElementById("submitBtn").addEventListener("click", async () => {
   const input = document.getElementById("response");
   const btn = document.getElementById("submitBtn");
@@ -155,16 +153,11 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
 
   if (!input.value.trim() || btn.disabled) return;
 
-  await fetch(webhookURL, {
+  await fetch("https://server-proxygals.gonzalesartandrei913.workers.dev/", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      content: "**📨 New Submission**",
-      embeds: [{
-        color: 3066993,
-        fields: [{ name: "Response", value: input.value }],
-        timestamp: new Date()
-      }]
+      response: input.value
     })
   });
 
@@ -174,6 +167,3 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
   thankyou.style.display = "block";
 });
 </script>
-
-</body>
-</html>
