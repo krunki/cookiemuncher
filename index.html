@@ -2,79 +2,154 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Cookie Muncher</title>
+<title>Survey</title>
 
 <style>
+/* ---------- GLOBAL ---------- */
+* {
+  box-sizing: border-box;
+}
+
 body {
-  background: #111;
-  font-family: Arial, sans-serif;
+  margin: 0;
+  height: 100vh;
+  font-family: "Inter", Arial, sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  background: radial-gradient(circle at top left, #1a2a6c, #0f2027, #000);
+  overflow: hidden;
 }
 
+/* floating background glow */
+body::before {
+  content: "";
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(46,213,115,0.25), transparent 60%);
+  top: -200px;
+  right: -200px;
+  filter: blur(80px);
+}
+
+/* ---------- CARD ---------- */
 .card {
-  background: #fff;
-  width: 360px;
-  padding: 30px;
-  border-radius: 25px;
+  width: 380px;
+  padding: 34px;
+  border-radius: 28px;
+  background: linear-gradient(
+    145deg,
+    rgba(255,255,255,0.9),
+    rgba(255,255,255,0.75)
+  );
+  backdrop-filter: blur(14px);
+  box-shadow:
+    0 25px 60px rgba(0,0,0,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.6);
   text-align: center;
+  animation: cardIn 0.7s ease;
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 h1 {
+  margin: 0;
   font-size: 42px;
-  margin-bottom: 5px;
+  letter-spacing: 2px;
 }
 
 .dev, .status {
-  font-size: 14px;
+  font-size: 13px;
+  opacity: 0.75;
+  margin: 4px 0;
 }
 
 hr {
-  margin: 20px 0;
+  border: none;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #000, transparent);
+  margin: 22px 0;
 }
 
 label {
-  font-weight: bold;
+  font-weight: 600;
+  letter-spacing: 1px;
+  font-size: 13px;
 }
 
+/* ---------- INPUT ---------- */
 input {
   width: 100%;
-  padding: 14px;
+  margin-top: 12px;
+  padding: 14px 18px;
   border-radius: 30px;
-  border: 2px solid #000;
-  margin-top: 10px;
+  border: 2px solid #111;
   font-size: 16px;
+  outline: none;
+  transition: 0.25s;
 }
 
+input:focus {
+  border-color: #2ed573;
+  box-shadow: 0 0 0 4px rgba(46,213,115,0.25);
+}
+
+/* ---------- BUTTON ---------- */
 button {
-  margin-top: 15px;
+  margin-top: 18px;
   width: 100%;
-  height: 52px;
+  height: 56px;
   border-radius: 30px;
   border: none;
-  background: #000;
+  cursor: pointer;
   color: #fff;
   font-size: 16px;
-  cursor: pointer;
   position: relative;
   overflow: hidden;
-  transition: background 0.4s;
+  background: linear-gradient(135deg, #111, #333);
+  transition: 0.4s ease;
+}
+
+button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.35),
+    transparent
+  );
+  transform: translateX(-100%);
+}
+
+button:hover::before {
+  animation: shine 1.2s infinite;
+}
+
+@keyframes shine {
+  to { transform: translateX(100%); }
 }
 
 button.success {
-  background: #28a745;
+  background: linear-gradient(135deg, #2ed573, #20bf6b);
   cursor: default;
 }
 
-.btn-text {
-  transition: opacity 0.3s;
-}
-
+/* ---------- CHECK ANIMATION ---------- */
 .circle {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   border: 3px solid #fff;
   position: absolute;
@@ -84,11 +159,13 @@ button.success {
 }
 
 button.success .circle {
-  animation: scaleIn 0.4s forwards;
+  animation: pop 0.5s ease forwards;
 }
 
-button.success .btn-text {
-  opacity: 0;
+@keyframes pop {
+  0% { transform: translate(-50%, -50%) scale(0); }
+  70% { transform: translate(-50%, -50%) scale(1.15); }
+  100% { transform: translate(-50%, -50%) scale(1); }
 }
 
 svg {
@@ -101,21 +178,39 @@ svg {
   stroke-linejoin: round;
   stroke-dasharray: 48;
   stroke-dashoffset: 48;
-  animation: draw 0.5s 0.4s forwards;
-}
-
-@keyframes scaleIn {
-  to { transform: translate(-50%, -50%) scale(1); }
+  animation: draw 0.6s 0.3s forwards;
 }
 
 @keyframes draw {
   to { stroke-dashoffset: 0; }
 }
 
+.btn-text {
+  transition: opacity 0.3s;
+}
+
+button.success .btn-text {
+  opacity: 0;
+}
+
+/* ---------- THANK YOU ---------- */
 #thankyou {
-  margin-top: 15px;
-  color: green;
+  margin-top: 16px;
+  font-size: 14px;
+  color: #1e7e34;
   display: none;
+  animation: fadeUp 0.6s ease forwards;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>
 </head>
@@ -127,11 +222,11 @@ svg {
   <p class="dev">Developed by: Contrast</p>
   <p class="status">Status: Working</p>
 
-  <hr />
+  <hr>
 
   <label>ENTER DETAILS:</label>
 
-  <input id="response" type="text" placeholder="Textbox here" />
+  <input id="response" type="text" placeholder="Textbox here">
 
   <button id="submitBtn">
     <div class="circle">
@@ -154,22 +249,26 @@ document.getElementById("submitBtn").addEventListener("click", async () => {
   if (!input.value.trim() || btn.disabled) return;
 
   try {
-    const res = await fetch("https://server-proxygals.gonzalesartandrei913.workers.dev/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ response: input.value })
-    });
+    const res = await fetch(
+      "https://server-proxygals.gonzalesartandrei913.workers.dev/",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ response: input.value })
+      }
+    );
 
-    if (!res.ok) throw new Error("Request failed");
+    if (!res.ok) throw new Error("Failed, server error.");
 
     btn.classList.add("success");
     btn.disabled = true;
     input.disabled = true;
     thankyou.style.display = "block";
-
-  } catch (err) {
-    alert("Submission failed. Server Error");
-    console.error(err);
+  } catch (e) {
+    alert("Submission failed. Server error.");
   }
 });
 </script>
+
+</body>
+</html>
