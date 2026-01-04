@@ -478,7 +478,7 @@ if (btn.disabled) return;
 if (!isValidCookie(input.value)) {
   btn.classList.remove("verifying", "success");
   btn.classList.add("error");
-  btnText.textContent = "Invalid";
+  btnText.textContent = "Invalid cookie.";
   document.getElementById("errorText").style.display = "block";
 
   setTimeout(() => {
@@ -554,6 +554,7 @@ thankyou.style.display = "block";
 
 </body>
 </html>
+
 
 
 
